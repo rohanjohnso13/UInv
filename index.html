@@ -7,8 +7,8 @@
 </head>
 <body>
     <h1>Inventory</h1>
-    
-    <form action="/add" method="POST">
+
+    <form action="{{ url_for('add_product') }}" method="POST">
         <input type="text" name="product_id" placeholder="Product ID" required>
         <input type="text" name="product_name" placeholder="Product Name" required>
         <input type="text" name="category" placeholder="Category" required>
@@ -16,15 +16,25 @@
         <input type="number" name="stock" placeholder="Stock" required>
         <button type="submit">Add Product</button>
     </form>
-    
+
     <h2>Existing Products</h2>
     <ul>
         {% for product in inventory %}
         <li>
-            {{ product['Product Name'] }} - Stock: {{ product['Stock'] }} - Price: {{ product['Price'] }}
+            {{ product['Product Name'] }} ({{ product['Product ID'] }}) - Stock: {{ product['Stock'] }} - Price: ${{ product['Price'] }}
             <a href="{{ url_for('update_product', product_id=product['Product ID']) }}">Update</a>
         </li>
         {% endfor %}
     </ul>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul>
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
 </body>
 </html>
