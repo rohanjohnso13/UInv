@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Management</title>
+</head>
+<body>
+    <h1>Inventory</h1>
+    
+    <form action="/add" method="POST">
+        <input type="text" name="product_id" placeholder="Product ID" required>
+        <input type="text" name="product_name" placeholder="Product Name" required>
+        <input type="text" name="category" placeholder="Category" required>
+        <input type="number" name="price" placeholder="Price" required>
+        <input type="number" name="stock" placeholder="Stock" required>
+        <button type="submit">Add Product</button>
+    </form>
+    
+    <h2>Existing Products</h2>
+    <ul>
+        {% for product in inventory %}
+        <li>
+            {{ product['Product Name'] }} - Stock: {{ product['Stock'] }} - Price: {{ product['Price'] }}
+            <a href="{{ url_for('update_product', product_id=product['Product ID']) }}">Update</a>
+        </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

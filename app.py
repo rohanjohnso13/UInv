@@ -1,9 +1,12 @@
-import tkinter as tk
-from tkinter import messagebox
+from flask import Flask, render_template, request, redirect, url_for, flash
 import csv, os
+
+app = Flask(__name__)
+app.secret_key = 'your_secret_key'  # Needed for flash messages
 
 FILE_NAME = "inventory.csv"
 
+# Load and save inventory functions
 def load_inventory():
     if not os.path.exists(FILE_NAME):
         return []
@@ -16,47 +19,45 @@ def save_inventory(inventory):
         writer.writeheader()
         writer.writerows(inventory)
 
+# Routes for web interface
+@app.route('/')
+def index():
+    inventory = load_inventory()
+    return render_template('index.html', inventory=inventory)
+
+@app.route('/add', methods=['POST'])
 def add_product():
     product = {
-        "Product ID": product_id_entry.get(),
-        "Product Name": product_name_entry.get(),
-        "Category": category_entry.get(),
-        "Price": price_entry.get(),
-        "Stock": stock_entry.get(),
+        "Product ID": request.form['product_id'],
+        "Product Name": request.form['product_name'],
+        "Category": request.form['category'],
+        "Price": request.form['price'],
+        "Stock": request.form['stock'],
         "Total Sales": "0"
     }
     inventory = load_inventory()
     if any(p['Product ID'] == product['Product ID'] for p in inventory):
-        messagebox.showerror("Error", "Product ID exists!")
+        flash("Product ID exists!", "error")
     else:
         inventory.append(product)
         save_inventory(inventory)
-        messagebox.showinfo("Success", "Product added!")
+        flash("Product added successfully!", "success")
+    return redirect(url_for('index'))
 
-root = tk.Tk()
-root.title("Inventory Management System")
+@app.route('/update/<product_id>', methods=['GET', 'POST'])
+def update_product(product_id):
+    inventory = load_inventory()
+    product = next((p for p in inventory if p['Product ID'] == product_id), None)
+    
+    if request.method == 'POST':
+        product['Price'] = request.form['price']
+        product['Stock'] = request.form['stock']
+        save_inventory(inventory)
+        flash("Product updated successfully!", "success")
+        return redirect(url_for('index'))
 
-tk.Label(root, text="Product ID").grid(row=0, column=0)
-product_id_entry = tk.Entry(root)
-product_id_entry.grid(row=0, column=1)
+    return render_template('update.html', product=product)
 
-tk.Label(root, text="Product Name").grid(row=1, column=0)
-product_name_entry = tk.Entry(root)
-product_name_entry.grid(row=1, column=1)
+if __name__ == '__main__':
+    app.run(debug=True)
 
-tk.Label(root, text="Category").grid(row=2, column=0)
-category_entry = tk.Entry(root)
-category_entry.grid(row=2, column=1)
-
-tk.Label(root, text="Price").grid(row=3, column=0)
-price_entry = tk.Entry(root)
-price_entry.grid(row=3, column=1)
-
-tk.Label(root, text="Stock").grid(row=4, column=0)
-stock_entry = tk.Entry(root)
-stock_entry.grid(row=4, column=1)
-
-add_button = tk.Button(root, text="Add Product", command=add_product)
-add_button.grid(row=5, column=0, columnspan=2)
-
-root.mainloop()

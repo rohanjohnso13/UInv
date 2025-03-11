@@ -7,11 +7,11 @@ WORKDIR /app
 # Copy project files into the container
 COPY . /app
 
-# Install dependencies (if any, like tkinter or csv, you can add them to requirements.txt if needed)
+# Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Expose the port your app will run on (if applicable)
+# Expose port for Flask to run on
 EXPOSE 5000
 
-# Command to run your app
+# Start the Flask application
 CMD ["python", "app.py"]
