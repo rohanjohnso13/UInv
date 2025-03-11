@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 import csv, os
+from urllib.parse import quote as url_quote
+
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Needed for flash messages
@@ -60,4 +62,5 @@ def update_product(product_id):
 
 if __name__ == '__main__':
     app.run(debug=True)
+
 
